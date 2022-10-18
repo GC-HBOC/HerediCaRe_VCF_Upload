@@ -29,7 +29,7 @@ public class ParseVcf {
         ParseVcfUtils myUtils = new ParseVcfUtils();
         
 
-        //create directory if not already existing
+        //create directories if not already existing
         String[] neededFolders = {myParser.processedFolder, myParser.errorFolder, myParser.uploadFolder}; 
         for(String i:neededFolders){ myUtils.createDir(i);};
 
@@ -39,8 +39,32 @@ public class ParseVcf {
         //Get all available vcf files
         File vcfInputDir = new File(myParser.inputFolder);
         String[] vcfToParse = vcfInputDir.list();
-        for (String string : vcfToParse) {
-            System.out.println(string);
+        for (String file : vcfToParse) {
+            if (file.endsWith(".vcf")){
+                // parse the filename to get some metadata infos = [reference, patientenID, MGU-BogenNr, MitarbeiterID, Zeitstempel]
+                String errorOutput="ok";
+                int i = file.lastIndexOf(".");
+                String[] sfile =  {file.substring(0, i), file.substring(i)};
+                String[] infos=new String[5];
+                if(sfile.length>0){
+                    String[] temp =sfile[0].split("\\-");
+                    if(temp.length == 5 ) infos = temp;
+                    else{ errorOutput= "Fehlerhafter Dateiname";}
+                }else{ errorOutput= "Fehlerhafter Dateiname";}
+
+                // create a file object
+                VcfFile fileObject = new VcfFile(infos);
+
+                // save the header and the Variants from vcf file
+                myUtils.saveVcfContent(fileObject, vcfInputDir + "\\" + file); 
+                
+                // save the lifted over part
+                fileObject.liftedOver = hgLiftOver.encoding_and_liftover(fileObject.variants, fileObject.referenceGenome);
+                System.out.println("origin"+ fileObject.variants);
+                System.out.println("lifted"+ fileObject.liftedOver);
+                hgLiftOver.l
+            }
+        //System.out.println(transcriptMap);
             
         }
 
