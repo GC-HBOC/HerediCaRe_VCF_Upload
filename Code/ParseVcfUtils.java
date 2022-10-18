@@ -15,7 +15,7 @@ public class ParseVcfUtils {
             }
         }
     }
-    public HashMap makeTranscriptMap(String transcriptFileName){
+    public HashMap<String, String> makeTranscriptMap(String transcriptFileName){
         HashMap<String, String> transcripts = new HashMap<String, String>();
         try{
             File transcriptFile = new File(transcriptFileName);
@@ -33,5 +33,31 @@ public class ParseVcfUtils {
             System.out.println("ERROR while reading "+transcriptFileName);
         }
         return transcripts;
+    }
+
+    public void saveVcfContent(VcfFile theFile, String vcfPath){
+        ArrayList<String> vcfMetadata = new ArrayList<String>();
+        ArrayList<String> vcfVariants = new ArrayList<String>();
+        
+        try{
+            File vcfFile = new File(vcfPath);
+            Scanner vcfReader = new Scanner(vcfFile);
+            while(vcfReader.hasNextLine()){
+                String vcfLine = vcfReader.nextLine().trim();
+                if(vcfLine.startsWith("#")){
+                    vcfMetadata.add(vcfLine);
+                } else {
+                    vcfVariants.add(vcfLine);
+                }
+            }
+            vcfReader.close();
+        } catch(FileNotFoundException se){
+            System.out.println("ERROR while reading "+vcfPath);
+        }
+
+        //ArrayList<ArrayList<String>> vcfContent = new ArrayList<ArrayList<String>>();
+        theFile.metadata = vcfMetadata;
+        theFile.variants = vcfVariants;
+        //return vcfContent;
     }
 }
