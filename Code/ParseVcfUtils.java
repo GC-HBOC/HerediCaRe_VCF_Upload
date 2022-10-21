@@ -54,10 +54,23 @@ public class ParseVcfUtils {
         } catch(FileNotFoundException se){
             System.out.println("ERROR while reading "+vcfPath);
         }
-
-        //ArrayList<ArrayList<String>> vcfContent = new ArrayList<ArrayList<String>>();
         theFile.metadata = vcfMetadata;
         theFile.variants = vcfVariants;
-        //return vcfContent;
+    }
+    public void parseVariant(String line, HashMap<String, String> transcript, VcfFile file){
+        Variant toSave = new Variant();
+        
+        if (!line.startsWith("#") && line.contains("ANN")){
+            String[] lineList = line.trim().split("\t");
+            toSave.chrom = lineList[0];
+            toSave.posHg38 = lineList[1];
+            toSave.refHg38 = lineList[3];
+            toSave.altHg38 = lineList[4];
+            String variantInfos = lineList[7];
+            String variantFormat = lineList[9];
+            
+            System.out.println(lineList[0]);
+            
+        }
     }
 }

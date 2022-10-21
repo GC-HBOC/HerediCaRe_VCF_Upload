@@ -10,6 +10,7 @@ public class VcfFile {
     ArrayList<String> variants;
     ArrayList<String> liftedOver;
     ArrayList<String> normalized;
+    ArrayList<Variant> passedVariants;
 
     public VcfFile(String[] infos){
         this.referenceGenome = infos[0];

@@ -98,7 +98,7 @@ public class ParseVcf {
                         
                         // for every line in snpEff output
                         for(String s=pout.readLine(); s!=null; s=pout.readLine()){
-                            System.out.println("one"+s);
+                            myUtils.parseVariant(s, transcriptMap, fileObject);
 
                         }
                         
