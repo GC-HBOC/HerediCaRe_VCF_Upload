@@ -9,7 +9,7 @@ public class VcfFile {
     ArrayList<String> metadata;
     ArrayList<String> variants;
     ArrayList<String> liftedOver;
-    ArrayList<String> normalised;
+    ArrayList<String> normalized;
 
     public VcfFile(String[] infos){
         this.referenceGenome = infos[0];
