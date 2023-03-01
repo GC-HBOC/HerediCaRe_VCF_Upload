@@ -1,0 +1,6 @@
+Debug*
+VCF Input/*
+resources/ChromFa/hg19/*
+resources/ChromFa/hg38/*
+resources/snpEff/data*
+Output/*
