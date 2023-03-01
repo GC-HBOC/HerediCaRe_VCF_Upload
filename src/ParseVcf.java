@@ -16,7 +16,7 @@ public class ParseVcf {
     String rejectedVariants;
 
     public ParseVcf(){
-        this.inputFolder = "VCF\sInput";
+        this.inputFolder = "";
         this.debugFolder = "Debug";
         this.uploadFolder = "Output";
         this.normalizedFolder = this.debugFolder+"\\Normalized\sVCFs";
@@ -47,7 +47,7 @@ public class ParseVcf {
         ArgumentParser parser = ArgumentParsers.newFor("ParseVCF").build();
 
         parser.addArgument("-i")
-            .setDefault(myParser.inputFolder)
+            .required(true)
             .metavar("<input path>")
             .help("Folder with VCF files to parse (default: "+ myParser.inputFolder +")");
         
@@ -102,9 +102,23 @@ public class ParseVcf {
             GENOME = res.get("genome");
             RAMVALUE = res.get("ram");
         } catch (ArgumentParserException e) {
-            parser.handleError(e);
+            parser.handleError(e);System.exit(1);
         }
 
+        /*
+         * Check the ressource folder
+        */
+        if(!(new File("resources").exists()) || ((new File("resources")).list().length ==0) ){System.err.println("Resources folder missing/empty. Check the README and follow the instructions"); System.exit(1);}
+        
+        File vcfInputDir = new File(myParser.inputFolder);
+        String[] vcfToParse = vcfInputDir.list();
+        if(!(vcfInputDir.exists()) || (vcfToParse.length ==0) ){System.err.println(myParser.inputFolder + " folder missing/empty"); System.exit(1);}
+        /*
+         * create a Hashmap for the transcript
+         */
+        System.out.println("Parsing transcript file " + myParser.panelTranscriptFileName);
+        HashMap<String, String[]> transcriptMap = myUtils.makeTranscriptMap(myParser.panelTranscriptFileName);
+        
         /*
          * create directories if not already existing
          */
@@ -113,18 +127,11 @@ public class ParseVcf {
         String[] neededFolders = {myParser.debugFolder, myParser.processedFolder,myParser.normalizedFolder, myParser.errorFolder, myParser.uploadFolder, myParser.tmpFolder,myParser.rejectedVariants}; 
         for(String i:neededFolders){ myUtils.createDir(i);};
         
-        
-        /*
-         * create a Hashmap for the transcript
-         */
-        System.out.println("Parsing transcript file " + myParser.panelTranscriptFileName);
-        HashMap<String, String[]> transcriptMap = myUtils.makeTranscriptMap(myParser.panelTranscriptFileName);
-        
         /*
          * Get all available files and work only with files ending by .vcf
          */
-        File vcfInputDir = new File(myParser.inputFolder);
-        String[] vcfToParse = vcfInputDir.list();
+        
+        
         System.out.println("Found a total of "+ vcfToParse.length +" files to process in the folder: "+myParser.inputFolder);
         for (String file : vcfToParse) {
             if (file.endsWith(".vcf")){
@@ -179,7 +186,7 @@ public class ParseVcf {
 
                     //create a new process to run snpEff
                     System.out.println("snpEff is running...");
-                    System.out.println(JAVA+" -Xmx"+RAMVALUE+"g -jar \""+SNPEFF+"\" "+ GENOME +" -noStats -noLog "+myParser.tmpFolder+"\\"+file);
+                    //System.out.println(JAVA+" -Xmx"+RAMVALUE+"g -jar \""+SNPEFF+"\" "+ GENOME +" -noStats -noLog "+myParser.tmpFolder+"\\"+file);
                     Process p = Runtime.getRuntime().exec(JAVA+" -Xmx"+RAMVALUE+"g -jar \""+SNPEFF+"\" "+ GENOME +" -noStats -noLog "+myParser.tmpFolder+"\\"+file);
                     
                     
@@ -264,6 +271,8 @@ public class ParseVcf {
         //delete the tmp folder
         File tmp = new File(myParser.tmpFolder);
         tmp.delete();
+        System.out.println("\nProcessed original VCFs in "+myParser.debugFolder+"\\"+myParser.processedFolder);
+        System.out.println("Failed original VCFs in "+myParser.debugFolder+"\\"+myParser.errorFolder);
 
     }//end main
     
