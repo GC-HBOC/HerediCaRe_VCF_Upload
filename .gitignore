@@ -5,3 +5,5 @@ resources/ChromFa/hg38/*
 resources/snpEff/data*
 Output/*
 Historie_VCF_Datei.docx
+steps_done.txt
+workflow.txt
