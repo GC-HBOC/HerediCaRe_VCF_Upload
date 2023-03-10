@@ -28,7 +28,7 @@ public class Variant{
     
     //To see major informations in case of debug
     public String toString(){
-        return gene+"\t"+nm+"\t"+hgvsC+"\t"+hgvsP+"\t"+annotation+"\t"+patho+"\t"+chrom+"\t"+posHg19+"\t"+refHg19+"\t"+altHg19+"\t"+posHg38+"\t"+refHg38+"\t"+altHg38+"\t"+zygot;
+        return gene+"\t"+nm+"\t"+hgvsC+"\t"+hgvsP+"\t"+annotation+"\t"+patho+"\t"+chrom+"\t"+posHg19+"\t"+refHg19+"\t"+altHg19+"\t"+posHg38+"\t"+refHg38+"\t"+altHg38+"\t"+zygot+"\t"+failure;
     }
     
     // Displays as string. will be one line in the output file

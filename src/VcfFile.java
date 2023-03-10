@@ -15,6 +15,7 @@ public class VcfFile {
     ArrayList<String> liftedOver;
     ArrayList<String> normalized;
     ArrayList<Variant> passedVariants;
+    ArrayList<String> snpEffVariants;
 
     public VcfFile(String[] infos){
         this.referenceGenome = infos[0];
@@ -27,6 +28,7 @@ public class VcfFile {
         this.liftedOver = new ArrayList<String>();
         this.normalized = new ArrayList<String>();
         this.passedVariants = new ArrayList<Variant>();
+        this.snpEffVariants = new ArrayList<String>();
     }
 
 }

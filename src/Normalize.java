@@ -46,7 +46,7 @@ class Normalize{
 							for(int j = 0; j<anzahl;j++) outputs[j]+= colms[i]+"\t"; 
 						for(int i = 0; i<anzahl;i++) outputs[i]=outputs[i].substring(0,outputs[i].length()-1);
 						// write into the file 
-						for(int i = 0; i<anzahl;i++) normlines.add(outputs[i]+"\n");
+						for(int i = 0; i<anzahl;i++) normlines.add(outputs[i]);
 					}else
 						normlines.add(line);
 				}else
@@ -152,27 +152,41 @@ class Normalize{
      * if number of class erroneous output an exception 
      */
     private static String[] get_all_comb(String inf,int anzahl, String classmt) throws DataFormatException{
+        // check if class have the same number as the alt allele
         String[] out=new String[anzahl];
         if(inf.startsWith(classmt))
             if(inf.split("=")[1].split(",").length != anzahl)
                 throw new DataFormatException();
         
-        
+        // check if class is just a flag
         if(!inf.contains("=")){
             for(int i = 0; i<anzahl;i++) out[i] = inf;
             return out;
         }
+
+
         String[] tmp = inf.split("=");
         String[] re = tmp[1].split(",");
-        if(re.length == 1){
-            String retmp=re[0];
+
+        // info same as alt number = A/G
+        if (re.length == anzahl){
+            for(int i =0; i<anzahl;i++){out[i]=tmp[0] + "=" + re[i];}
+            return out;
+        // info is number=R so, number of alt + reference
+        } else if (re.length == anzahl+1){
+            for(int i =0; i<anzahl;i++){out[i]=tmp[0] + "=" + re[0]+","+re[i+1];}
+            return out;
+        // info is number=./1
+        } else{
+            String retmp=String.join(",",re);
             re = new String[anzahl];
-            for(int i =0; i<anzahl;i++) re[i]= retmp;
+            for(int i =0; i<anzahl;i++) {re[i]= retmp;}
+            for(int i =0; i<anzahl;i++) {out[i]=tmp[0] + "=" + re[i];}
+            return out;
         }
-        if(re.length != anzahl) {System.out.println("#### Erroneous number \n "+re.length+"  "+tmp[0]);return null;}
-        for(int i =0; i<anzahl;i++)
-            out[i]=tmp[0] + "=" + re[i];
-        return out;
+
+        //if(re.length != anzahl) {System.out.println("#### Erroneous number \n "+re.length+"  "+tmp[0]);return null;}
+
     }
     
     // delete all "N" right and left from ref and alt & replace "." to "" 

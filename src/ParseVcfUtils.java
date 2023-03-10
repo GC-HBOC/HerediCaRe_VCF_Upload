@@ -159,8 +159,13 @@ public class ParseVcfUtils {
             }
             //Another line filter. LATER
             for (Variant i:firstStep){
-                multSave.add(i);
+                if (i.failure.length()==0){
+                    multSave.add(i);
+
+                }
             }
+            if (multSave.isEmpty()){multSave.add(firstStep.get(0));}
+
 
 
         } else{

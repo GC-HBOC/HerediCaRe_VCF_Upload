@@ -11,6 +11,7 @@ public class ParseVcf {
     String processedFolder;
     String errorFolder;
     String tmpFolder;
+    String snpEffLog;
     String uploadFolder;
     String panelTranscriptFileName;
     String rejectedVariants;
@@ -23,8 +24,9 @@ public class ParseVcf {
         this.processedFolder = this.debugFolder+"\\Processed";
         this.errorFolder = this.debugFolder+"\\Error";
         this.tmpFolder = this.debugFolder+"\\.temp";
+        this.snpEffLog = this.debugFolder+"\\snpEff";
         this.rejectedVariants = this.debugFolder+"\\Rejected\sVariants";
-        this.panelTranscriptFileName = "resources\\BRCA_Panel_Transcripts_v009.tsv";
+        this.panelTranscriptFileName = "resources\\transcript.tsv";
 
     }
     
@@ -44,47 +46,49 @@ public class ParseVcf {
         /*
          * Create arguments with the argparse4j package
          */
-        ArgumentParser parser = ArgumentParsers.newFor("ParseVCF").build();
+        ArgumentParser parser = ArgumentParsers.newFor("ParseVCF").build()
+                                                .defaultHelp(true)
+                                                .description("Parse VCF to txt for database upload.");
 
-        parser.addArgument("-i")
+        parser.addArgument("input")
             .required(true)
-            .metavar("<input path>")
-            .help("Folder with VCF files to parse (default: "+ myParser.inputFolder +")");
+            .metavar("<Input>")
+            .help("Folder with VCF files to parse");
         
         parser.addArgument("-o")
             .setDefault(myParser.uploadFolder)
-            .metavar("<output path>")
-            .help("Output folder for final .txt files (default: "+ myParser.uploadFolder +")");
+            .metavar("<output>")
+            .help("Output folder for final .txt files");
         
         parser.addArgument("-sp")
             .setDefault(SNPEFF)
-            .metavar("<snpEff path>")
-            .help("Path to snpEff JAR file (default: "+SNPEFF+")");
+            .metavar("<snpEff>")
+            .help("Path to snpEff JAR file");
 
         parser.addArgument("-genome")
             .setDefault(GENOME)
             .metavar("<database>")		
-            .help("snpEff database name (default: "+GENOME+")");
+            .help("snpEff database name");
 
         parser.addArgument("-jp")
             .setDefault(JAVA)
-            .metavar("<java path>")
-            .help("Path to the java executable. Note that Java v>=12 is required to run snpEff! (default: "+ JAVA +")");
+            .metavar("<java>")
+            .help("Path to the java executable. Note that Java v>=12 is required to run snpEff!");
 
         parser.addArgument("-d")
             .setDefault(myParser.debugFolder)
-            .metavar("<debug path>")
-            .help("Debug Folder. Contains processed, erroneous & normalized VCFs + Rejected Variants(.tsv) (default: "+ myParser.debugFolder +")");
+            .metavar("<debug>")
+            .help("Debug Folder. Contains processed, erroneous & normalized VCFs + Rejected Variants(.tsv)");
 
         parser.addArgument("-ram")	
             .setDefault(RAMVALUE)
             .metavar("<value>")
-            .help("Accessible RAM (GB) for java virtual machine(default: "+ RAMVALUE +")");
+            .help("Accessible RAM (GB) for java virtual machine");
 
         parser.addArgument("-t")	
             .setDefault(myParser.panelTranscriptFileName)
             .metavar("<transcript>")
-            .help("Transcript file (default: "+ myParser.panelTranscriptFileName +")");
+            .help("Transcript file");
 
 
 
@@ -93,7 +97,7 @@ public class ParseVcf {
          */
         try { 
             Namespace res = parser.parseArgs(args);
-            myParser.inputFolder = res.get("i");
+            myParser.inputFolder = res.get("input");
             myParser.uploadFolder = res.get("o");
             myParser.debugFolder = res.get("d");
             myParser.panelTranscriptFileName = res.get("t");
@@ -124,7 +128,7 @@ public class ParseVcf {
          */
         System.out.println("\nCreating mandatory directories, if not existing");
 
-        String[] neededFolders = {myParser.debugFolder, myParser.processedFolder,myParser.normalizedFolder, myParser.errorFolder, myParser.uploadFolder, myParser.tmpFolder,myParser.rejectedVariants}; 
+        String[] neededFolders = {myParser.debugFolder, myParser.snpEffLog, myParser.processedFolder,myParser.normalizedFolder, myParser.errorFolder, myParser.uploadFolder, myParser.tmpFolder,myParser.rejectedVariants}; 
         for(String i:neededFolders){ myUtils.createDir(i);};
         
         /*
@@ -213,7 +217,7 @@ public class ParseVcf {
                     output.write("CHROM("+fileObject.referenceGenome+")\tPOS\tREF\tALT\tFAILURE\n");
                     for(String s=pout.readLine(); s!=null; s=pout.readLine()){
                         if (!s.startsWith("#")){
-                            
+                            fileObject.snpEffVariants.add(s);
                             ArrayList<Variant> allVar = myUtils.parseVariant(s,transcriptMap);
                             for(Variant tmpVar:allVar){                           
                                 if (tmpVar.failure.length()==0){
@@ -241,8 +245,12 @@ public class ParseVcf {
             
                         }
                     }
+
                     output.close();
                     
+                    //save snpEff output
+                    myUtils.snpEffFile(myParser.snpEffLog+"\\"+file, fileObject.metadata, fileObject.snpEffVariants);
+
                     //output value from snpEff program
                     p.waitFor();
 
@@ -271,8 +279,8 @@ public class ParseVcf {
         //delete the tmp folder
         File tmp = new File(myParser.tmpFolder);
         tmp.delete();
-        System.out.println("\nProcessed original VCFs in "+myParser.debugFolder+"\\"+myParser.processedFolder);
-        System.out.println("Failed original VCFs in "+myParser.debugFolder+"\\"+myParser.errorFolder);
+        System.out.println("\nProcessed VCFs in "+myParser.processedFolder);
+        System.out.println("Failed VCFs in "+myParser.errorFolder);
 
     }//end main
     
