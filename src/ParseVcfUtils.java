@@ -23,9 +23,10 @@ public class ParseVcfUtils {
 
     public HashMap<String, String[]> makeTranscriptMap(String transcriptFileName){
         HashMap<String, String[]> transcripts = new HashMap<String, String[]>();
+        Scanner transcriptReader = null;
         try{
             File transcriptFile = new File(transcriptFileName);
-            Scanner transcriptReader = new Scanner(transcriptFile);
+            transcriptReader = new Scanner(transcriptFile);
             while(transcriptReader.hasNextLine()){
                 String transcriptLine = transcriptReader.nextLine().trim();
                 if(!transcriptLine.toUpperCase().contains("NM")) continue;
@@ -34,19 +35,23 @@ public class ParseVcfUtils {
                     transcripts.put(keyVal[1].split("\\.")[0], new String[] {keyVal[0],keyVal[2]});
                 }
             }
-            transcriptReader.close();
+            
         } catch(FileNotFoundException se){
-            System.err.println("ERROR while reading "+transcriptFileName);
+            System.out.println("ERROR while reading "+transcriptFileName);
             System.exit(1);
+        } finally{
+            if(transcriptReader !=null){
+            transcriptReader.close();}
         }
         return transcripts;
     }
 
     public void saveVcfContent(ArrayList<String> metadata, ArrayList<String> variants, String vcfPath){
         
+        Scanner vcfReader = null;
         try{
             File vcfFile = new File(vcfPath);
-            Scanner vcfReader = new Scanner(vcfFile);
+            vcfReader = new Scanner(vcfFile);
             Boolean var = false;
             while(vcfReader.hasNextLine()){
                 String vcfLine = myStrip(vcfReader.nextLine().trim(), "\"");
@@ -64,15 +69,18 @@ public class ParseVcfUtils {
                     metadata.add("##"+vcfLine);
                 }
             }
-            vcfReader.close();
+            
         } catch(FileNotFoundException se){
             System.out.println("ERROR while reading "+vcfPath);
+        } finally{
+            if(vcfReader !=null){
+                vcfReader.close();}
         }
     }
 
     public void snpEffFile(String tmpFile, ArrayList<String> metadata, ArrayList<String> content){
-        BufferedWriter output=null;
         
+        BufferedWriter output=null;
         try {
             File outfile = new File(tmpFile);
             output = new BufferedWriter(new FileWriter(outfile));
@@ -82,9 +90,17 @@ public class ParseVcfUtils {
             for(String line: content){
                 output.write(line+"\n");
             }
-            output.close();
+            
         } catch(Exception e){
-            System.out.println("Error while handling file "+tmpFile);
+            System.out.println("Error while creating snpEff input file "+tmpFile);
+        } finally{
+            if(output !=null){
+                try {
+                    output.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }}
         }
     }
 
@@ -299,9 +315,16 @@ public class ParseVcfUtils {
             output.newLine();
             output.write("COMMIT;");
             output.newLine();
-            output.close();
         } catch(Exception e){
             System.out.println("Error while handling file "+filename);
+        } finally{
+            if(output !=null){
+                try {
+                    output.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }}
         }
     }
 
@@ -324,6 +347,6 @@ public class ParseVcfUtils {
         if (mySource.renameTo(new File(destination))){
             mySource.delete();
             
-        } else{System.err.println("Error while moving file "+source);}
+        } else{System.out.println("Error while moving file "+source);}
     }
 }

@@ -72,8 +72,9 @@ public class hgLiftOver{
     */
 	public static ArrayList<String> findChain(String chainFileName, String chrom, int chrompos){
         ArrayList<String> outchain = new ArrayList<String>();
+        BufferedReader br = null;
         try{
-			BufferedReader br = new BufferedReader(new FileReader(chainFileName));
+			br = new BufferedReader(new FileReader(chainFileName));
             String line;
             while ((line = br.readLine()) != null) {
                 if(!line.contains("chain"))
@@ -95,10 +96,19 @@ public class hgLiftOver{
                     }
                 }
             }
-			br.close();
+			
         }catch(IOException e){
 			e.printStackTrace(System.out);
-		}
+		} finally{
+            if(br!=null){
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
         return outchain;
     }
 

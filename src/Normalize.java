@@ -272,10 +272,10 @@ class Normalize{
             pos =0;
             len=postmp-1;
         }
+        BufferedReader reader = null;
         try {
             File file = new File( referenceFastaPath + "\\" + reference + "\\chr"+chrom+".fa");
-            BufferedReader reader = new BufferedReader(new FileReader(file));
-            
+            reader = new BufferedReader(new FileReader(file));
             reader.readLine();
             reader.skip(pos); 
             String line = "";
@@ -286,11 +286,19 @@ class Normalize{
                 line += c ;
                 i++;
             }
-            reader.close();
             return line;
         } catch (IOException e) {
             //e.printStackTrace();
             return null;
+        } finally{
+            if (reader!=null){
+            try {
+                reader.close();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            } 
         }
     }
     

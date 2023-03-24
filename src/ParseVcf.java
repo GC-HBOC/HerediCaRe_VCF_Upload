@@ -112,11 +112,11 @@ public class ParseVcf {
         /*
          * Check the ressource folder
         */
-        if(!(new File("resources").exists()) || ((new File("resources")).list().length ==0) ){System.err.println("Resources folder missing/empty. Check the README and follow the instructions"); System.exit(1);}
+        if(!(new File("resources").exists()) || ((new File("resources")).list().length ==0) ){System.out.println("Resources folder missing/empty. Check the README and follow the instructions"); System.exit(1);}
         
         File vcfInputDir = new File(myParser.inputFolder);
         String[] vcfToParse = vcfInputDir.list();
-        if(!(vcfInputDir.exists()) || (vcfToParse.length ==0) ){System.err.println(myParser.inputFolder + " folder missing/empty"); System.exit(1);}
+        if(!(vcfInputDir.exists()) || (vcfToParse.length ==0) ){System.out.println(myParser.inputFolder + " folder missing/empty"); System.exit(1);}
         /*
          * create a Hashmap for the transcript
          */
@@ -212,41 +212,49 @@ public class ParseVcf {
                      */
 
                     BufferedWriter output=null;
-                    File outfile = new File(myParser.rejectedVariants+"\\"+file.replaceFirst(".vcf", ".tsv"));
-                    output = new BufferedWriter(new FileWriter(outfile));
-                    output.write("CHROM("+fileObject.referenceGenome+")\tPOS\tREF\tALT\tFAILURE\n");
-                    for(String s=pout.readLine(); s!=null; s=pout.readLine()){
-                        if (!s.startsWith("#")){
-                            fileObject.snpEffVariants.add(s);
-                            ArrayList<Variant> allVar = myUtils.parseVariant(s,transcriptMap);
-                            for(Variant tmpVar:allVar){                           
-                                if (tmpVar.failure.length()==0){
-                                    
-                                    if (fileObject.referenceGenome.equals("hg19")){
-                                        String[] moreInfo = fileObject.normalized.get(pos).trim().split("\t"); 
-                                        tmpVar.posHg19 = moreInfo[1];
-                                        tmpVar.refHg19 = moreInfo[3];
-                                        tmpVar.altHg19 = moreInfo[4];
-                                    } else{
-                                        String[] moreInfo = fileObject.liftedOver.get(pos).trim().split("\t"); 
-                                        tmpVar.posHg19 = moreInfo[1];
-                                        tmpVar.refHg19 = moreInfo[3];
-                                        tmpVar.altHg19 = moreInfo[4];
-                                    }
-                                    fileObject.passedVariants.add(tmpVar);
+                    try {
+                        File outfile = new File(myParser.rejectedVariants+"\\"+file.replaceFirst(".vcf", ".tsv"));
+                        output = new BufferedWriter(new FileWriter(outfile));
+                        output.write("CHROM("+fileObject.referenceGenome+")\tPOS\tREF\tALT\tFAILURE\n");
+                        for(String s=pout.readLine(); s!=null; s=pout.readLine()){
+                            if (!s.startsWith("#")){
+                                fileObject.snpEffVariants.add(s);
+                                ArrayList<Variant> allVar = myUtils.parseVariant(s,transcriptMap);
+                                for(Variant tmpVar:allVar){                           
+                                    if (tmpVar.failure.length()==0){
+                                        
+                                        if (fileObject.referenceGenome.equals("hg19")){
+                                            String[] moreInfo = fileObject.normalized.get(pos).trim().split("\t"); 
+                                            tmpVar.posHg19 = moreInfo[1];
+                                            tmpVar.refHg19 = moreInfo[3];
+                                            tmpVar.altHg19 = moreInfo[4];
+                                        } else{
+                                            String[] moreInfo = fileObject.liftedOver.get(pos).trim().split("\t"); 
+                                            tmpVar.posHg19 = moreInfo[1];
+                                            tmpVar.refHg19 = moreInfo[3];
+                                            tmpVar.altHg19 = moreInfo[4];
+                                        }
+                                        fileObject.passedVariants.add(tmpVar);
 
-                                } else {
-                                    String[] variant = fileObject.normalized.get(pos).trim().split("\t");
-                                    output.write(variant[0]+"\t"+variant[1]+"\t"+variant[3]+"\t"+variant[4]+"\t"+tmpVar.failure+"\n");
-                                } 
-                                
+                                    } else {
+                                        String[] variant = fileObject.normalized.get(pos).trim().split("\t");
+                                        output.write(variant[0]+"\t"+variant[1]+"\t"+variant[3]+"\t"+variant[4]+"\t"+tmpVar.failure+"\n");
+                                    } 
+                                    
+                                }
+                                pos+=1;
+                
                             }
-                            pos+=1;
-            
+                        }
+                    } catch (Exception e){
+                            System.out.println("Error handling "+ myParser.rejectedVariants+"\\"+file.replaceFirst(".vcf", ".tsv"));
+                    } finally{
+                        if (output!=null){
+                            output.close();
                         }
                     }
 
-                    output.close();
+                    
                     
                     //save snpEff output
                     myUtils.snpEffFile(myParser.snpEffLog+"\\"+file, fileObject.metadata, fileObject.snpEffVariants);
