@@ -95,7 +95,6 @@ public class Variant{
 			   (this.altHg19.equals(other.altHg19));
 	}
     private boolean softEquals(Variant other){
-		return (this.gene.equals(other.gene)) &&
-			   (this.hgvsC.equals(other.hgvsC));
+		return (this.gene.equals(other.gene));
 	}
 }

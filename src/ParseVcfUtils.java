@@ -218,9 +218,9 @@ public class ParseVcfUtils {
             if(n.contains("MutDB:Classification")){
                 String c=n.split("=")[1];
                 if(c.equals("pathogenic")) out = "5";
-                if(c.equals("likely pathogenic")) out = "4";
-                if(c.equals("uncertain significance")) out = "3";
-                if(c.equals("likely benign")) out = "2";
+                if(c.equals("likelypathogenic")) out = "4";
+                if(c.equals("uncertainsignificance")) out = "3";
+                if(c.equals("likelybenign")) out = "2";
                 if(c.equals("benign")) out = "1";
                 if(c.equals("undefined")) out = "";
                 return out;

@@ -82,7 +82,7 @@ public class hgLiftOver{
 
                 String[] infos = line.split("\\s+");
                 
-                if(infos[2].endsWith(chrom)){
+                if(fixChr(infos[2]).equals(chrom)){
                     int startpos = Integer.parseInt(infos[5]);
                     int endpos = Integer.parseInt(infos[6]);
                     if(startpos - 1 <= chrompos && chrompos <= endpos){
