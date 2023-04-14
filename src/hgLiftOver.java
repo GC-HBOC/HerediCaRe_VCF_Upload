@@ -48,7 +48,7 @@ public class hgLiftOver{
 				continue;
 			}
 			String[] columns= line.split("\t",3);
-			String chrom = columns[0];
+			String chrom = fixChr(columns[0]);
 			int pos = Integer.parseInt(columns[1]);
 			ArrayList<String> chain = findChain(chainFileName, chrom, pos);
             try{

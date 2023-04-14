@@ -179,8 +179,7 @@ public class ParseVcf {
                      * LiftOver Variants depending of the reference genome of the original input file
                      *  Create a temporary file, which will be deleted after snpEff running
                      */
-                    fileObject.liftedOver = hgLiftOver.encoding_and_liftover(fileObject.variants, fileObject.referenceGenome);
-                    
+                    fileObject.liftedOver = hgLiftOver.encoding_and_liftover(fileObject.normalized, fileObject.referenceGenome);
                     if (fileObject.referenceGenome.equals("hg19")){
                         myUtils.snpEffFile(myParser.tmpFolder+"\\"+file, fileObject.metadata, fileObject.liftedOver);
 
@@ -220,7 +219,7 @@ public class ParseVcf {
                             if (!s.startsWith("#")){
                                 fileObject.snpEffVariants.add(s);
                                 ArrayList<Variant> allVar = myUtils.parseVariant(s,transcriptMap);
-                                for(Variant tmpVar:allVar){                           
+                                for(Variant tmpVar:allVar){                         
                                     if (tmpVar.failure.length()==0){
                                         
                                         if (fileObject.referenceGenome.equals("hg19")){
@@ -247,6 +246,7 @@ public class ParseVcf {
                             }
                         }
                     } catch (Exception e){
+                            e.printStackTrace();
                             System.out.println("Error handling "+ myParser.rejectedVariants+"\\"+file.replaceFirst(".vcf", ".tsv"));
                     } finally{
                         if (output!=null){
