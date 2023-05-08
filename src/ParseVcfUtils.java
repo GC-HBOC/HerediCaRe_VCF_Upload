@@ -1,13 +1,17 @@
 import java.io.*;
 import java.util.*;
-
+import org.mozilla.universalchardet.UniversalDetector;
 /*
  * Utils class for several methods use in the main Parser Class
  * 
  */
 
 public class ParseVcfUtils {
-
+    public String encodingDetector (String myFile) throws java.io.IOException {
+		java.io.File file = new java.io.File(myFile);
+		String encoding = UniversalDetector.detectCharset(file);
+		return encoding;
+	}
     public void createDir(String dir){
         File myDir = new File(dir);
         if (!myDir.exists()) {
@@ -51,7 +55,7 @@ public class ParseVcfUtils {
         Scanner vcfReader = null;
         try{
             File vcfFile = new File(vcfPath);
-            vcfReader = new Scanner(vcfFile);
+            vcfReader = new Scanner(vcfFile, encodingDetector(vcfPath));
             Boolean var = false;
             while(vcfReader.hasNextLine()){
                 String vcfLine = myStrip(vcfReader.nextLine().trim(), "\"");
@@ -70,7 +74,7 @@ public class ParseVcfUtils {
                 }
             }
             
-        } catch(FileNotFoundException se){
+        } catch(IOException se){
             System.out.println("ERROR while reading "+vcfPath);
         } finally{
             if(vcfReader !=null){
