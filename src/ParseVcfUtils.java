@@ -154,7 +154,7 @@ public class ParseVcfUtils {
                     toSave.nm = annList[6];
                     toSave.hgvsC = annList[9];
                     toSave.hgvsP = annList[10];
-                    toSave.annotation = annList[1];
+                    toSave.annotation = getEffect(annList[1]);
                     int duplicate;
                     try{
                         duplicate = toSave.checkClinical(firstStep);
@@ -208,7 +208,7 @@ public class ParseVcfUtils {
                 toSave.nm = ann[6];
                 toSave.hgvsC = ann[9];
                 toSave.hgvsP = ann[10];
-                toSave.annotation = ann[1];
+                toSave.annotation = getEffect(ann[1]);
             }else{toSave.failure +="#Invalid TranscriptID";}
             multSave.add(toSave);
         }
@@ -352,5 +352,13 @@ public class ParseVcfUtils {
             mySource.delete();
             
         } else{System.out.println("Error while moving file "+source);}
+    }
+
+    public String getEffect(String rawEffect) {
+        if (rawEffect.contains("&")){
+            return rawEffect.split("&")[0];
+        } else{
+            return rawEffect;
+        }
     }
 }
