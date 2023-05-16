@@ -140,7 +140,8 @@ public class ParseVcfUtils {
                 toSave.refHg38 = lineList[3];
                 toSave.altHg38 = lineList[4];
                 toSave.patho = filterForPatho(variantInfos);
-                if (toSave.patho == null){toSave.failure+="#Invalid CLASS";}
+                ArrayList<String> pathoVal = new ArrayList<>(Arrays.asList("1","2","3","4","5","")); 
+                if (!pathoVal.contains(toSave.patho)){toSave.failure+="#Invalid CLASS";}
                 try{
                     String[] variantFormat = lineList[9].split(":", 0);
                     toSave.zygot = filterForZygot(variantFormat);
