@@ -114,7 +114,7 @@ public class ParseVcfUtils {
         String[] variantInfos = lineList[7].split(";");
         String annotation = null;
         for(String info:variantInfos){
-            if(info.contains("ANN")){
+            if(info.contains("ANN=")){
                 annotation = info.split("=")[1];
                 break;
             } // Stop so far the smpEff annotation has been found 
